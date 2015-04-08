@@ -22,8 +22,8 @@ def read_data():
             data_matrix.append([row[0]] + [process_timestamp(row[1])] + row[2:5])
             rating_matrix.append(row[5:])
 
-        # replace all missing values with 0
-        rating_matrix = [[x if x is not '' else '0' for x in y] for y in rating_matrix]
+        # first pad each array with 0 until the end, and then also replace any '' with 0
+        rating_matrix = [[x if x is not '' else '0' for x in y + ['0']*(8 - len(y))] for y in rating_matrix]
         # convert to numpy ints
         rating_matrix = np.array(rating_matrix, dtype='int')
 
