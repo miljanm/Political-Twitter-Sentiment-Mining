@@ -4,6 +4,7 @@ from datetime import datetime
 from pprint import pprint
 from itertools import islice
 
+from sklearn.feature_extraction.text import CountVectorizer
 
 __author__ = 'miljan'
 
@@ -11,7 +12,7 @@ __author__ = 'miljan'
 def read_data():
     with open('./data/tweets.tsv', 'rU') as file1:
         # filter removes the rows starting with # (comments)
-        file_reader = csv.reader(filter(lambda x: x[0] != '#', file1), delimiter='\t', dialect=csv.excel_tab)
+        file_reader = csv.reader(filter(lambda x: x[0] in str.digits, file1), delimiter='\t', dialect=csv.excel_tab)
         # skip header
         file_reader.next()
 
@@ -33,6 +34,15 @@ def read_data():
 def process_timestamp(timestamp):
     return datetime.strptime(timestamp, '%m/%d/%y %H:%M')
 
+def cleaned_bag_of_words_dataset(data_matrix):
+    tweets = [data_point[2] for data_point in data_matrix]
+    
+    count_vectorizer = CountVectorizer()
+    
+    return count_vectorizer.fit_transform(tweets)
 
 if __name__ == '__main__':
     data_matrix, rating_matrix = read_data()
+    
+    print len(rating_matrix)
+    print cleaned_bag_of_words_dataset(data_matrix).shape
