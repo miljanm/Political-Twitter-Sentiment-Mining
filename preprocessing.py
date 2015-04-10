@@ -14,7 +14,7 @@ __author__ = 'miljan'
 def read_data():
     with open('./data/tweets.tsv', 'rU') as file1:
         # filter removes the rows starting with # (comments)
-        file_reader = csv.reader(filter(lambda x: x[0] != '#', file1), delimiter='\t', dialect=csv.excel_tab)
+        file_reader = csv.reader(filter(lambda x: x[0] in str.digits, file1), delimiter='\t', dialect=csv.excel_tab)
 
         # matrix containing all 8 ranking for each tweet
         rating_matrix = []
