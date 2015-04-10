@@ -57,6 +57,3 @@ target/
 
 .idea/
 
-/preprocessing.pyc
-/.pydevproject
-/.project
