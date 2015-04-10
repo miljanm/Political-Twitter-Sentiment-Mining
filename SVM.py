@@ -23,7 +23,7 @@ if __name__ == '__main__':
     TFIDFs = [False, True]
     stop_wordss = [None, 'english']
     max_featuress = np.linspace(10, 5000, 5).tolist() + [None]
-    ngram_ranges = [(1, 2)]
+    ngram_ranges = [(1, 1)] # ngram_ranges = [(1, 1),(1, 2)]
     lengths = [True, False]
     number_in_tweets = [True, False]
     words_presents = [['obama', 'mccain'], []]
@@ -59,7 +59,7 @@ if __name__ == '__main__':
             fold = 0
             for train, val in KFold(N_tweets, n_folds=20):
                 fold += 1
-                print fold 
+                #print fold 
                 
                 # Separate dataset into training and validation
                 X_train, X_val, y_train, y_val = transformed_tweets[train], transformed_tweets[val], majority_rating[train], majority_rating[val]
@@ -77,7 +77,7 @@ if __name__ == '__main__':
             f1_score_macro = f1_score(rating_real, rating_pred, average='macro')
             
             # Print the results
-            print "C =", C, ", stemming = ", stemming, ", TFIDF =", TFIDF, ", stop_words = ", stop_words, ", max_features = ", max_features, ", ngram_range = ", ngram_range
+            print "C =", C, ", stemming = ", stemming, ", TFIDF =", TFIDF, ", stop_words = ", stop_words, ", max_features = ", max_features, ", ngram_range = ", ngram_range, ", length = ", length, ", number_in_tweet = ", number_in_tweet, ", words_presents = ", words_presents
             #print cm
             print f1_score_macro
             print ""
