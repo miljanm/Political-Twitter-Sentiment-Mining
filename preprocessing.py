@@ -6,7 +6,6 @@ from pprint import pprint
 from itertools import islice
 
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
 
 __author__ = 'miljan'
 
@@ -30,41 +29,21 @@ def read_data():
 
     return data_matrix, rating_matrix
 
-def argmax(arr):
-    max_element = max(arr)
-    i = 0 
-    arg_maxes = []
-    for element in arr:
-        if element == max_element:
-             arg_maxes.append(i)
-        i += 1
-    
-    # return the least confident result
-    return arg_maxes[-1]
 
 def process_timestamp(timestamp):
     return datetime.strptime(timestamp, '%m/%d/%y %H:%M')
 
 
-
-def cleaned_bag_of_words_dataset(data_matrix, stop_words=None, TFIDF=False, ngram_range=(1, 1), max_features=None):
+def cleaned_bag_of_words_dataset(data_matrix):
     tweets = [data_point[2] for data_point in data_matrix]
     
-    if TFIDF:
-        vectorizer = TfidfVectorizer(stop_words=stop_words, ngram_range=ngram_range, max_features=max_features)
-    else:
-        vectorizer = CountVectorizer(stop_words=stop_words, ngram_range=ngram_range, max_features=max_features)
+    count_vectorizer = CountVectorizer()
     
-    return vectorizer.fit_transform(tweets)
-
-def majority_voting_ratings(rating_matrix):
-    majority_rating = []
-    for ratings in rating_matrix:
-        majority_rating.append(argmax(np.bincount(ratings)[1:]))
-    
-    return np.array(majority_rating)
-
+    return count_vectorizer.fit_transform(tweets)
 
 
 if __name__ == '__main__':
     data_matrix, rating_matrix = read_data()
+    
+    print len(rating_matrix)
+    print cleaned_bag_of_words_dataset(data_matrix).shape
