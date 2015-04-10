@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+import string as str
 from datetime import datetime
 from pprint import pprint
 from itertools import islice
@@ -14,8 +15,6 @@ def read_data():
     with open('./data/tweets.tsv', 'rU') as file1:
         # filter removes the rows starting with # (comments)
         file_reader = csv.reader(filter(lambda x: x[0] != '#', file1), delimiter='\t', dialect=csv.excel_tab)
-        # skip header
-        file_reader.next()
 
         # matrix containing all 8 ranking for each tweet
         rating_matrix = []
@@ -46,6 +45,7 @@ def argmax(arr):
 def process_timestamp(timestamp):
     return datetime.strptime(timestamp, '%m/%d/%y %H:%M')
 
+
 def cleaned_bag_of_words_dataset(data_matrix, stop_words=None, TFIDF=False, ngram_range=(1, 1), max_features=None):
     tweets = [data_point[2] for data_point in data_matrix]
     
@@ -62,6 +62,7 @@ def majority_voting_ratings(rating_matrix):
         majority_rating.append(argmax(np.bincount(ratings)[1:]))
     
     return np.array(majority_rating)
+
 
 if __name__ == '__main__':
     data_matrix, rating_matrix = read_data()
