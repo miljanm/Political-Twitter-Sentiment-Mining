@@ -5,6 +5,8 @@ from datetime import datetime
 from pprint import pprint
 from itertools import islice
 
+from nltk.tokenize import word_tokenize
+from nltk.stem.snowball import SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -47,9 +49,13 @@ def process_timestamp(timestamp):
 
 
 
-def cleaned_bag_of_words_dataset(data_matrix, stop_words=None, TFIDF=False, ngram_range=(1, 1), max_features=None):
-    tweets = [data_point[2] for data_point in data_matrix]
-    
+def cleaned_bag_of_words_dataset(data_matrix, stemming=False, stop_words=None, TFIDF=False, ngram_range=(1, 1), max_features=None):
+    if stemming:
+        stemmer = SnowballStemmer("english")
+        tweets = [" ".join([stemmer.stem(word) for word in word_tokenize(data_point[2].decode("utf8"))]) for data_point in data_matrix]
+    else:
+        tweets = [data_point[2] for data_point in data_matrix]
+        
     if TFIDF:
         vectorizer = TfidfVectorizer(stop_words=stop_words, ngram_range=ngram_range, max_features=max_features)
     else:
