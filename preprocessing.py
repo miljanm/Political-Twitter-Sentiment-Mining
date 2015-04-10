@@ -46,6 +46,7 @@ def process_timestamp(timestamp):
     return datetime.strptime(timestamp, '%m/%d/%y %H:%M')
 
 
+
 def cleaned_bag_of_words_dataset(data_matrix, stop_words=None, TFIDF=False, ngram_range=(1, 1), max_features=None):
     tweets = [data_point[2] for data_point in data_matrix]
     
@@ -62,6 +63,7 @@ def majority_voting_ratings(rating_matrix):
         majority_rating.append(argmax(np.bincount(ratings)[1:]))
     
     return np.array(majority_rating)
+
 
 
 if __name__ == '__main__':
