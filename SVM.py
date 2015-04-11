@@ -17,7 +17,7 @@ if __name__ == '__main__':
     random.seed(42)
     
     # Parameter space
-    Cs = np.logspace(3, 8, num=5)
+    Cs = np.logspace(2, 8, num=6)
     
     stemmings = [True, False]
     TFIDFs = [False, True]
