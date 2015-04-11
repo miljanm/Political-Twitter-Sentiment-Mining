@@ -11,7 +11,6 @@ from preprocessing import *
 from itertools import product
 
 from sklearn.feature_extraction.text import CountVectorizer
-from enable.savage.svg.css.values import length
 
 if __name__ == '__main__':
     random.seed(42)
