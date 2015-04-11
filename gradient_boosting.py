@@ -25,7 +25,7 @@ if __name__ == '__main__':
     max_featuress = np.linspace(10, 5000, 5).tolist() + [None]
     ngram_ranges = [(1, 1)] # ngram_ranges = [(1, 1),(1, 2)]
     lengths = [True, False]
-    number_in_tweets = [True, False]
+    number_in_tweets = [True]
     words_presents = [['obama', 'mccain'], []]
     
     parameter_space = product(stemmings, TFIDFs, stop_wordss, max_featuress, ngram_ranges, lengths, number_in_tweets, words_presents)
