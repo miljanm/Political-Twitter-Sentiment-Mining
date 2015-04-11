@@ -101,6 +101,19 @@ def majority_voting_ratings(rating_matrix):
     
     return np.array(majority_rating)
 
+def convert_4_to_3(x):
+    if x == 4:
+        return 3
+    return x
+
+def majority_voting_ratings_merge_3_4(rating_matrix):
+    majority_rating = []
+    for ratings in rating_matrix:
+        ratings = map(convert_4_to_3, ratings)
+        majority_rating.append(argmax(np.bincount(ratings)[1:]))
+    
+    return np.array(majority_rating)
+
 
 
 if __name__ == '__main__':
