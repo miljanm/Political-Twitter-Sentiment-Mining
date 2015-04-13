@@ -10,6 +10,9 @@ from nltk.stem.snowball import SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+from gensim.models.word2vec import Word2Vec
+
+
 __author__ = 'miljan'
 
 
@@ -32,6 +35,7 @@ def read_data():
 
     return data_matrix, rating_matrix
 
+
 def argmax(arr):
     max_element = max(arr)
     i = 0 
@@ -47,6 +51,7 @@ def argmax(arr):
 def process_timestamp(timestamp):
     return datetime.strptime(timestamp, '%m/%d/%y %H:%M')
 
+
 def list_of_ints_from_string(s):
     l = []
     for t in word_tokenize(s.decode("utf8")):
@@ -56,6 +61,7 @@ def list_of_ints_from_string(s):
             pass
         
     return l
+
 
 def cleaned_bag_of_words_dataset(data_matrix, stemming=False, stop_words=None, TFIDF=False, ngram_range=(1, 1), max_features=None,
                                  length=False, number_in_tweet=False, words_present=[]):
@@ -94,6 +100,84 @@ def cleaned_bag_of_words_dataset(data_matrix, stemming=False, stop_words=None, T
     return dataset
 
 
+# derive sentence representation have sum of word vectors
+def _build_sent_vec_as_sum(clean_sent, model):
+    temp = np.zeros((1, 300))
+    for word in clean_sent:
+        try:
+            temp += model[word]
+        except:
+            pass
+    return temp
+
+
+# derive sentence representation as average of word vectors
+def _build_sent_vec_as_average(clean_sent, model):
+    temp = np.zeros((1, 300))
+    count = 0
+    for word in clean_sent:
+        try:
+            temp += model[word]
+            count += 1
+        except:
+            pass
+    return temp/count if count > 0 else temp
+
+
+def word2vec_features(data_matrix, stemming=False, stop_words=None, TFIDF=False, ngram_range=(1, 1), max_features=None,
+                      length=False, number_in_tweet=False, words_present=[], policy='sum'):
+    print '\n------------------'
+    print 'Creating feature vector matrix...\n'
+    if stemming:
+        print '\n------------------'
+        print 'Stemming...'
+        stemmer = SnowballStemmer("english")
+        tweets = [" ".join([stemmer.stem(word) for word in word_tokenize(data_point[2].lower().decode("utf8"))]) for data_point in data_matrix]
+    else:
+        tweets = [data_point[2].lower() for data_point in data_matrix]
+
+    print '\n------------------'
+    print 'Loading word2vec model...'
+
+    model = Word2Vec.load_word2vec_format('./data/GoogleNews-vectors-negative300.bin', binary=True)  # C binary format
+
+    # determine the policy on how to build vectors
+    if policy == 'sum':
+        policy = _build_sent_vec_as_sum
+    else:
+        policy = _build_sent_vec_as_average
+
+    print 'Applying word2vec model...'
+
+    # create a len(tweets) x 300 dimensional matrix
+    dataset = np.squeeze(np.array([policy(sent, model) for sent in tweets]))
+
+    print "Done"
+
+    if length:
+        lengths = np.array([[len(word_tokenize(data_point[2].decode("utf8")))] for data_point in data_matrix])
+        dataset = np.concatenate((dataset, lengths), axis=1)
+
+    if number_in_tweet:
+        numbers = []
+        for data_point in data_matrix:
+            number_list = list_of_ints_from_string(data_point[2])
+            filtered_number_list = [number for number in number_list if abs(number) < 10]
+            if len(filtered_number_list) == 0:
+                numbers.append([0])
+            else:
+                numbers.append([np.mean(filtered_number_list)])
+        dataset = np.concatenate((dataset, numbers), axis=1)
+
+    for word in words_present:
+        word_present = np.array([[int(word.lower() in word_tokenize(data_point[2].lower().decode("utf8")))] for data_point in data_matrix])
+        dataset = np.concatenate((dataset, word_present), axis=1)
+
+    print '\n------------------'
+    print 'Feature vector constructed.'
+    return dataset
+
+
 def majority_voting_ratings(rating_matrix):
     majority_rating = []
     for ratings in rating_matrix:
@@ -101,10 +185,12 @@ def majority_voting_ratings(rating_matrix):
     
     return np.array(majority_rating)
 
+
 def convert_4_to_3(x):
     if x == 4:
         return 3
     return x
+
 
 def majority_voting_ratings_merge_3_4(rating_matrix):
     majority_rating = []
@@ -113,7 +199,6 @@ def majority_voting_ratings_merge_3_4(rating_matrix):
         majority_rating.append(argmax(np.bincount(ratings)[1:]))
     
     return np.array(majority_rating)
-
 
 
 if __name__ == '__main__':
